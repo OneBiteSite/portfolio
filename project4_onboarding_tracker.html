@@ -1,0 +1,226 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+.app{background:var(--color-background-tertiary);min-height:580px;padding:1.25rem}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem}
+.topbar h1{font-size:17px;font-weight:500;color:var(--color-text-primary)}
+.topbar p{font-size:12px;color:var(--color-text-tertiary);margin-top:2px}
+.btn{padding:7px 14px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none}
+.btn-p{background:#7C3AED;color:#fff}
+
+.tabs{display:flex;gap:0;border-bottom:0.5px solid var(--color-border-tertiary);margin-bottom:1.25rem}
+.tab{padding:8px 16px;font-size:13px;color:var(--color-text-secondary);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-0.5px}
+.tab.active{color:#7C3AED;border-bottom-color:#7C3AED;font-weight:500}
+
+.overview-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:1.25rem}
+.stat{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:10px;padding:1rem}
+.stat-n{font-size:24px;font-weight:500;font-family:var(--font-mono)}
+.stat-l{font-size:11px;color:var(--color-text-tertiary);margin-top:4px}
+
+.employee-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.emp-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:12px;padding:1.25rem;cursor:pointer;transition:border-color 0.15s}
+.emp-card:hover{border-color:rgba(124,58,237,0.4)}
+.emp-card.expanded{border-color:#7C3AED}
+.emp-header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.avatar{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;font-weight:500}
+.emp-name{font-size:14px;font-weight:500;color:var(--color-text-primary)}
+.emp-role{font-size:12px;color:var(--color-text-tertiary)}
+.emp-dept{font-size:11px;color:#7C3AED;background:rgba(124,58,237,0.08);padding:1px 7px;border-radius:4px;display:inline-block;margin-left:auto}
+
+.prog-bar-bg{height:6px;background:var(--color-background-secondary);border-radius:3px;margin-bottom:6px}
+.prog-bar-fill{height:6px;border-radius:3px;transition:width 0.6s ease}
+.prog-label{display:flex;justify-content:space-between;font-size:11px;color:var(--color-text-tertiary);margin-bottom:8px}
+
+.checklist{display:flex;flex-direction:column;gap:4px;margin-top:8px;max-height:0;overflow:hidden;transition:max-height 0.4s ease}
+.checklist.open{max-height:400px}
+.check-item{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.check-item:last-child{border-bottom:none}
+.check-box{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--color-border-secondary);display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;transition:all 0.15s}
+.check-box.done{background:#10B981;border-color:#10B981}
+.check-box.done::after{content:'✓';color:#fff;font-size:9px;font-weight:700}
+.check-box.skip{background:#F59E0B;border-color:#F59E0B}
+.check-box.skip::after{content:'→';color:#fff;font-size:9px;font-weight:700}
+.check-label{font-size:12px;color:var(--color-text-secondary);flex:1}
+.check-label.done-txt{text-decoration:line-through;color:var(--color-text-tertiary)}
+.check-who{font-size:10px;color:var(--color-text-tertiary);font-family:var(--font-mono)}
+.check-day{font-size:10px;color:var(--color-text-tertiary);margin-left:auto}
+.expand-btn{width:100%;text-align:center;padding:6px;font-size:11px;color:#7C3AED;cursor:pointer;border:none;background:none;margin-top:4px}
+
+.timeline-view{display:none;flex-direction:column;gap:8px}
+.timeline-view.active{display:flex}
+.tl-day{display:flex;gap:12px;align-items:flex-start}
+.tl-day-label{font-size:11px;color:var(--color-text-tertiary);width:50px;flex-shrink:0;padding-top:10px;font-family:var(--font-mono)}
+.tl-events{flex:1;display:flex;flex-direction:column;gap:4px}
+.tl-event{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:8px}
+.tl-evt-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.tl-evt-name{font-size:12px;color:var(--color-text-primary)}
+.tl-evt-emp{font-size:11px;color:var(--color-text-tertiary)}
+
+.notification-dot{width:6px;height:6px;background:#EF4444;border-radius:50%;display:inline-block;margin-left:4px}
+</style>
+
+<div class="app">
+  <div class="topbar">
+    <div>
+      <h1>Employee Onboarding Tracker</h1>
+      <p>HR · 4 active onboardings · Week 3 of January</p>
+    </div>
+    <button class="btn btn-p" onclick="alert('New onboarding flow initiated')">+ Start Onboarding</button>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('board',this)">Board</div>
+    <div class="tab" onclick="switchTab('timeline',this)">Timeline</div>
+    <div class="tab" onclick="switchTab('reports',this)">Reports <span class="notification-dot"></span></div>
+  </div>
+
+  <div id="tab-board">
+    <div class="overview-grid">
+      <div class="stat"><div class="stat-n" style="color:#7C3AED">4</div><div class="stat-l">Active onboardings</div></div>
+      <div class="stat"><div class="stat-n" style="color:#10B981">23</div><div class="stat-l">Tasks completed today</div></div>
+      <div class="stat"><div class="stat-n" style="color:#F59E0B">3</div><div class="stat-l">Overdue items <span class="notification-dot"></span></div></div>
+      <div class="stat"><div class="stat-n" style="color:#06B6D4">87%</div><div class="stat-l">Avg. completion rate</div></div>
+    </div>
+    <div class="employee-grid" id="emp-grid"></div>
+  </div>
+
+  <div id="tab-timeline" style="display:none">
+    <div class="timeline-view active" id="tl-view"></div>
+  </div>
+
+  <div id="tab-reports" style="display:none;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:12px;padding:1.5rem">
+    <div style="font-size:14px;font-weight:500;margin-bottom:1rem">Onboarding Completion Report — January 2025</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:1.25rem">
+      <div style="text-align:center;padding:1rem;background:var(--color-background-secondary);border-radius:8px"><div style="font-size:28px;font-weight:500;color:#10B981;font-family:var(--font-mono)">12.4</div><div style="font-size:11px;color:var(--color-text-tertiary);margin-top:4px">Avg. days to complete</div></div>
+      <div style="text-align:center;padding:1rem;background:var(--color-background-secondary);border-radius:8px"><div style="font-size:28px;font-weight:500;color:#7C3AED;font-family:var(--font-mono)">94%</div><div style="font-size:11px;color:var(--color-text-tertiary);margin-top:4px">Task completion rate</div></div>
+      <div style="text-align:center;padding:1rem;background:var(--color-background-secondary);border-radius:8px"><div style="font-size:28px;font-weight:500;color:#06B6D4;font-family:var(--font-mono)">4.8/5</div><div style="font-size:11px;color:var(--color-text-tertiary);margin-top:4px">Employee satisfaction</div></div>
+    </div>
+    <div style="font-size:12px;color:var(--color-text-secondary);line-height:1.7">
+      ✅ Compared to paper-based process: <strong>68% reduction in administrative time</strong><br>
+      ✅ Average completion time reduced from 21 days → 12.4 days<br>
+      ✅ Zero missed compliance documents this month<br>
+      ⚠️ IT equipment provisioning delayed for 2 employees — escalated to IT lead
+    </div>
+  </div>
+</div>
+
+<script>
+const employees=[
+  {id:1,name:'Kristina Vasileva',role:'Junior Developer',dept:'IT',avatar:'KV',color:'rgba(124,58,237,0.15)',day:8,
+   tasks:[
+    {l:'Sign employment contract',done:true,who:'HR',day:'Day 1'},
+    {l:'IT equipment provisioned',done:true,who:'IT',day:'Day 1'},
+    {l:'Email & Slack access set up',done:true,who:'IT',day:'Day 1'},
+    {l:'Company handbook review',done:true,who:'Self',day:'Day 2'},
+    {l:'Meet with team lead',done:true,who:'Manager',day:'Day 2'},
+    {l:'First task assigned in Jira',done:true,who:'Manager',day:'Day 3'},
+    {l:'Complete security training',done:false,who:'HR',day:'Day 5'},
+    {l:'Code review: first PR',done:false,who:'Tech Lead',day:'Day 10'},
+    {l:'30-day performance check-in',done:false,who:'Manager',day:'Day 30'},
+   ]},
+  {id:2,name:'Stoyan Petkov',role:'Operations Manager',dept:'Operations',avatar:'SP',color:'rgba(6,182,212,0.15)',day:3,
+   tasks:[
+    {l:'Sign employment contract',done:true,who:'HR',day:'Day 1'},
+    {l:'Office access card',done:true,who:'Admin',day:'Day 1'},
+    {l:'ERP system orientation',done:false,who:'IT',day:'Day 2'},
+    {l:'Meet department heads',done:true,who:'CEO',day:'Day 1'},
+    {l:'Shadow warehouse shift',done:false,who:'Operations',day:'Day 3'},
+    {l:'Review process documentation',done:false,who:'Self',day:'Day 5'},
+    {l:'90-day plan draft',done:false,who:'Self',day:'Day 14'},
+   ]},
+  {id:3,name:'Anita Kostadinova',role:'Sales Executive',dept:'Sales',avatar:'AK',color:'rgba(16,185,129,0.15)',day:14,
+   tasks:[
+    {l:'Sign employment contract',done:true,who:'HR',day:'Day 1'},
+    {l:'CRM system training',done:true,who:'IT',day:'Day 2'},
+    {l:'Meet key client contacts',done:true,who:'Sales Dir.',day:'Day 3'},
+    {l:'Product knowledge test',done:true,who:'Self',day:'Day 5'},
+    {l:'First client call shadowed',done:true,who:'Sr. Sales',day:'Day 5'},
+    {l:'First independent client call',done:true,who:'Self',day:'Day 8'},
+    {l:'Pipeline review with manager',done:false,who:'Manager',day:'Day 14'},
+    {l:'30-day sales target set',done:false,who:'Manager',day:'Day 14'},
+   ]},
+  {id:4,name:'Georgi Dimitrov',role:'Accounting Specialist',dept:'Finance',avatar:'GD',color:'rgba(245,158,11,0.15)',day:5,
+   tasks:[
+    {l:'Sign employment contract',done:true,who:'HR',day:'Day 1'},
+    {l:'Accounting software access',done:false,who:'IT',day:'Day 1',overdue:true},
+    {l:'Review chart of accounts',done:false,who:'Self',day:'Day 2'},
+    {l:'Shadow month-end close',done:false,who:'CFO',day:'Day 3'},
+    {l:'GDPR data handling training',done:false,who:'HR',day:'Day 5',overdue:true},
+    {l:'Meet external auditor',done:false,who:'CFO',day:'Day 10'},
+   ]},
+];
+
+let expandedId=null;
+
+function calcPct(tasks){
+  return Math.round((tasks.filter(t=>t.done).length/tasks.length)*100);
+}
+
+function renderGrid(){
+  document.getElementById('emp-grid').innerHTML=employees.map(e=>{
+    const pct=calcPct(e.tasks);
+    const color=pct>=80?'#10B981':pct>=50?'#F59E0B':'#EF4444';
+    const isOpen=expandedId===e.id;
+    const checkHtml=e.tasks.map((t,ti)=>`
+      <div class="check-item">
+        <div class="check-box ${t.done?'done':t.overdue?'skip':''}" onclick="toggleTask(${e.id},${ti},event)"></div>
+        <span class="check-label ${t.done?'done-txt':''} ${t.overdue?'':''}">
+          ${t.overdue?'⚠️ ':''} ${t.l}
+        </span>
+        <span class="check-who">${t.who}</span>
+        <span class="check-day">${t.day}</span>
+      </div>`).join('');
+    return `<div class="emp-card ${isOpen?'expanded':''}" onclick="toggleCard(${e.id})">
+      <div class="emp-header">
+        <div class="avatar" style="background:${e.color}">${e.avatar}</div>
+        <div style="flex:1">
+          <div class="emp-name">${e.name}</div>
+          <div class="emp-role">${e.role} · Day ${e.day}</div>
+        </div>
+        <div class="emp-dept">${e.dept}</div>
+      </div>
+      <div class="prog-label"><span>${pct}% complete</span><span>${e.tasks.filter(t=>t.done).length}/${e.tasks.length} tasks</span></div>
+      <div class="prog-bar-bg"><div class="prog-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+      <div class="checklist ${isOpen?'open':''}">${checkHtml}</div>
+      <button class="expand-btn">${isOpen?'▲ Collapse':'▼ Show task checklist'}</button>
+    </div>`;
+  }).join('');
+}
+
+function toggleCard(id){
+  expandedId=expandedId===id?null:id;
+  renderGrid();
+}
+
+function toggleTask(empId,ti,e){
+  e.stopPropagation();
+  const emp=employees.find(em=>em.id===empId);
+  emp.tasks[ti].done=!emp.tasks[ti].done;
+  renderGrid();
+}
+
+function switchTab(tab,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-board').style.display=tab==='board'?'block':'none';
+  document.getElementById('tab-timeline').style.display=tab==='timeline'?'block':'none';
+  document.getElementById('tab-reports').style.display=tab==='reports'?'block':'none';
+}
+
+function renderTimeline(){
+  const days=[
+    {label:'Day 1',events:[{dot:'#10B981',name:'Contract signed — Kristina Vasileva',emp:'IT Dept'},{dot:'#10B981',name:'Contract signed — Stoyan Petkov',emp:'Operations'},{dot:'#10B981',name:'Equipment provisioned — Kristina',emp:'IT Support'},{dot:'#F59E0B',name:'Access card delayed — Georgi Dimitrov',emp:'Admin'}]},
+    {label:'Day 2',events:[{dot:'#10B981',name:'CRM training completed — Anita Kostadinova',emp:'Sales'},{dot:'#10B981',name:'Handbook review — Kristina',emp:'Self'},{dot:'#EF4444',name:'ERP access pending — Stoyan Petkov',emp:'IT (overdue)'}]},
+    {label:'Day 3',events:[{dot:'#10B981',name:'First task in Jira — Kristina',emp:'Tech Lead'},{dot:'#10B981',name:'Key client introductions — Anita',emp:'Sales Director'},{dot:'#7C3AED',name:'Today'}]},
+  ];
+  document.getElementById('tl-view').innerHTML=days.map(d=>`
+    <div class="tl-day">
+      <div class="tl-day-label">${d.label}</div>
+      <div class="tl-events">${d.events.map(ev=>`<div class="tl-event"><div class="tl-evt-dot" style="background:${ev.dot}"></div><div><div class="tl-evt-name">${ev.name}</div><div class="tl-evt-emp">${ev.emp}</div></div></div>`).join('')}</div>
+    </div>`).join('');
+}
+
+renderGrid();
+renderTimeline();
+</script>

@@ -1,0 +1,444 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); }
+
+  .port { background: #0F172A; color: #E2E8F0; min-height: 100vh; padding-bottom: 3rem; }
+
+  /* Nav */
+  .nav { display: flex; align-items: center; justify-content: space-between; padding: 1rem 2rem; border-bottom: 0.5px solid rgba(255,255,255,0.08); position: sticky; top: 0; background: rgba(15,23,42,0.92); backdrop-filter: blur(8px); z-index: 10; }
+  .nav-logo { font-size: 14px; font-weight: 500; color: #A78BFA; font-family: var(--font-mono); }
+  .nav-links { display: flex; gap: 1.5rem; }
+  .nav-links a { font-size: 13px; color: #94A3B8; text-decoration: none; cursor: pointer; }
+  .nav-links a:hover { color: #E2E8F0; }
+
+  /* Hero */
+  .hero { padding: 4rem 2rem 3rem; max-width: 860px; margin: 0 auto; }
+  .hero-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(124,58,237,0.15); border: 0.5px solid rgba(124,58,237,0.4); border-radius: 20px; padding: 4px 12px; font-size: 12px; color: #A78BFA; margin-bottom: 1.5rem; }
+  .hero-dot { width: 6px; height: 6px; background: #10B981; border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .hero h1 { font-size: 2.6rem; font-weight: 700; line-height: 1.15; margin-bottom: 1rem; }
+  .hero h1 span { background: linear-gradient(135deg, #7C3AED, #06B6D4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .hero-sub { font-size: 1.1rem; color: #94A3B8; line-height: 1.6; margin-bottom: 2rem; max-width: 560px; }
+  .hero-tagline { font-family: var(--font-mono); font-size: 13px; color: #10B981; margin-bottom: 2rem; }
+  .hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 2.5rem; }
+  .btn-primary { padding: 10px 20px; background: linear-gradient(135deg, #7C3AED, #06B6D4); border: none; border-radius: 8px; color: #fff; font-size: 14px; font-weight: 500; cursor: pointer; }
+  .btn-outline { padding: 10px 20px; background: transparent; border: 0.5px solid rgba(255,255,255,0.2); border-radius: 8px; color: #E2E8F0; font-size: 14px; cursor: pointer; }
+  .btn-outline:hover { border-color: rgba(124,58,237,0.6); }
+  .badges { display: flex; gap: 8px; flex-wrap: wrap; }
+  .badge { padding: 4px 10px; background: rgba(255,255,255,0.05); border: 0.5px solid rgba(255,255,255,0.1); border-radius: 6px; font-size: 12px; color: #CBD5E1; font-family: var(--font-mono); }
+  .badge.ai { border-color: rgba(124,58,237,0.4); color: #A78BFA; }
+
+  /* Section */
+  .section { padding: 3rem 2rem; max-width: 860px; margin: 0 auto; }
+  .section-label { font-size: 11px; font-weight: 500; color: #7C3AED; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 0.5rem; font-family: var(--font-mono); }
+  .section h2 { font-size: 1.6rem; font-weight: 700; color: #F1F5F9; margin-bottom: 1.5rem; }
+  .divider { border: none; border-top: 0.5px solid rgba(255,255,255,0.07); margin: 0 2rem; }
+
+  /* Value Prop */
+  .vp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .vp-card { background: rgba(255,255,255,0.03); border: 0.5px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.25rem; }
+  .vp-card h3 { font-size: 14px; font-weight: 500; color: #A78BFA; margin-bottom: 0.5rem; }
+  .vp-card p { font-size: 13px; color: #94A3B8; line-height: 1.6; }
+  .timeline { display: flex; gap: 0; margin-bottom: 1.5rem; }
+  .tl-item { flex: 1; position: relative; padding-bottom: 1rem; }
+  .tl-dot { width: 10px; height: 10px; border-radius: 50%; background: #7C3AED; margin-bottom: 8px; position: relative; z-index: 1; }
+  .tl-dot.active { background: #06B6D4; box-shadow: 0 0 8px rgba(6,182,212,0.5); }
+  .tl-line { position: absolute; top: 4px; left: 10px; right: 0; height: 0.5px; background: rgba(124,58,237,0.3); }
+  .tl-label { font-size: 11px; color: #64748B; font-family: var(--font-mono); }
+  .tl-title { font-size: 12px; color: #94A3B8; margin-top: 2px; }
+
+  /* Workflow */
+  .wf-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .wf-step { background: rgba(255,255,255,0.03); border: 0.5px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 1rem; position: relative; transition: border-color 0.2s; cursor: default; }
+  .wf-step:hover { border-color: rgba(124,58,237,0.4); }
+  .wf-num { font-size: 11px; font-family: var(--font-mono); color: #7C3AED; margin-bottom: 6px; }
+  .wf-title { font-size: 13px; font-weight: 500; color: #E2E8F0; margin-bottom: 4px; }
+  .wf-desc { font-size: 12px; color: #64748B; line-height: 1.5; }
+  .wf-tag { display: inline-block; margin-top: 8px; font-size: 11px; padding: 2px 8px; background: rgba(124,58,237,0.12); border-radius: 4px; color: #A78BFA; font-family: var(--font-mono); }
+  .metric-bar { background: rgba(16,185,129,0.1); border: 0.5px solid rgba(16,185,129,0.3); border-radius: 8px; padding: 1rem 1.5rem; margin-top: 1rem; display: flex; align-items: center; gap: 1rem; }
+  .metric-num { font-size: 1.8rem; font-weight: 700; color: #10B981; font-family: var(--font-mono); }
+  .metric-label { font-size: 13px; color: #94A3B8; }
+
+  /* Stack */
+  .stack-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+  .stack-cat { background: rgba(255,255,255,0.03); border: 0.5px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 1.25rem; }
+  .stack-cat h3 { font-size: 12px; font-weight: 500; color: #7C3AED; font-family: var(--font-mono); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 1rem; }
+  .skill-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .skill-name { font-size: 13px; color: #CBD5E1; }
+  .skill-bar-bg { flex: 1; height: 3px; background: rgba(255,255,255,0.06); border-radius: 2px; margin: 0 12px; }
+  .skill-bar-fill { height: 3px; border-radius: 2px; background: linear-gradient(90deg, #7C3AED, #06B6D4); }
+  .skill-level { font-size: 11px; color: #475569; font-family: var(--font-mono); }
+
+  /* Projects */
+  .proj-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .proj-card { background: rgba(255,255,255,0.03); border: 0.5px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.25rem; transition: border-color 0.2s; }
+  .proj-card:hover { border-color: rgba(124,58,237,0.4); }
+  .proj-card.featured { grid-column: 1 / -1; background: rgba(124,58,237,0.05); border-color: rgba(124,58,237,0.2); }
+  .proj-num { font-size: 11px; color: #475569; font-family: var(--font-mono); margin-bottom: 6px; }
+  .proj-title { font-size: 15px; font-weight: 500; color: #F1F5F9; margin-bottom: 8px; }
+  .proj-desc { font-size: 13px; color: #94A3B8; line-height: 1.6; margin-bottom: 12px; }
+  .proj-impact { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: #10B981; background: rgba(16,185,129,0.08); padding: 3px 10px; border-radius: 20px; margin-bottom: 10px; }
+  .proj-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+  .proj-tag { font-size: 11px; color: #64748B; background: rgba(255,255,255,0.04); border: 0.5px solid rgba(255,255,255,0.08); border-radius: 4px; padding: 2px 7px; font-family: var(--font-mono); }
+  .proj-links { display: flex; gap: 8px; }
+  .proj-link { font-size: 12px; color: #7C3AED; background: rgba(124,58,237,0.1); border: 0.5px solid rgba(124,58,237,0.2); border-radius: 6px; padding: 4px 10px; text-decoration: none; }
+
+  /* Education */
+  .edu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .edu-card { background: rgba(255,255,255,0.03); border: 0.5px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 1rem; }
+  .edu-icon { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; margin-bottom: 10px; }
+  .edu-icon.uni { background: rgba(124,58,237,0.15); }
+  .edu-icon.cert { background: rgba(6,182,212,0.15); }
+  .edu-icon.dev { background: rgba(16,185,129,0.15); }
+  .edu-title { font-size: 13px; font-weight: 500; color: #E2E8F0; margin-bottom: 4px; }
+  .edu-sub { font-size: 12px; color: #64748B; line-height: 1.5; }
+  .cert-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 1rem; }
+  .cert-badge { font-size: 11px; color: #06B6D4; background: rgba(6,182,212,0.08); border: 0.5px solid rgba(6,182,212,0.2); border-radius: 4px; padding: 3px 8px; font-family: var(--font-mono); }
+
+  /* Contact */
+  .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start; }
+  .contact-links { display: flex; flex-direction: column; gap: 10px; }
+  .contact-link { display: flex; align-items: center; gap: 10px; font-size: 13px; color: #94A3B8; text-decoration: none; }
+  .contact-link-icon { width: 28px; height: 28px; background: rgba(124,58,237,0.1); border: 0.5px solid rgba(124,58,237,0.2); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 10px; color: #A78BFA; }
+  .form-field { margin-bottom: 12px; }
+  .form-field label { display: block; font-size: 12px; color: #64748B; margin-bottom: 4px; }
+  .form-field input, .form-field textarea { width: 100%; background: rgba(255,255,255,0.04); border: 0.5px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 8px 12px; color: #E2E8F0; font-size: 13px; font-family: var(--font-sans); resize: none; outline: none; }
+  .form-field input:focus, .form-field textarea:focus { border-color: rgba(124,58,237,0.5); }
+
+  .avail-bar { background: rgba(16,185,129,0.08); border: 0.5px solid rgba(16,185,129,0.2); border-radius: 8px; padding: 0.75rem 1rem; font-size: 13px; color: #10B981; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 8px; }
+
+  /* GitHub placeholder */
+  .gh-grid { display: grid; grid-template-columns: repeat(52,1fr); gap: 2px; margin-bottom: 12px; }
+  .gh-cell { height: 8px; border-radius: 1px; }
+</style>
+
+<div class="port">
+
+  <!-- NAV -->
+  <nav class="nav">
+    <span class="nav-logo">&lt;DK /&gt;</span>
+    <div class="nav-links">
+      <a>About</a>
+      <a>Workflow</a>
+      <a>Stack</a>
+      <a>Projects</a>
+      <a>Contact</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge">
+      <span class="hero-dot"></span>
+      Available for Junior AI-First Developer roles
+    </div>
+    <h1>Denis Kedikov<br><span>AI-First Developer</span></h1>
+    <p class="hero-sub">Transforming manual workflows into scalable, AI-powered systems — with 17 years of process optimization discipline behind every line of code.</p>
+    <p class="hero-tagline">// 17 years of process optimization → building the future with AI-first development</p>
+    <div class="hero-ctas">
+      <button class="btn-primary">View Projects</button>
+      <button class="btn-outline">Download CV</button>
+      <button class="btn-outline">GitHub ↗</button>
+    </div>
+    <div class="badges">
+      <span class="badge ai">Cursor AI</span>
+      <span class="badge ai">Claude Code</span>
+      <span class="badge ai">GitHub Copilot</span>
+      <span class="badge">TypeScript</span>
+      <span class="badge">Next.js 14</span>
+      <span class="badge">Supabase</span>
+      <span class="badge">Vercel</span>
+      <span class="badge">Bulgaria · Remote</span>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ABOUT -->
+  <div class="section">
+    <p class="section-label">01 · About</p>
+    <h2>Why AI-First Development?</h2>
+
+    <!-- Timeline -->
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-line"></div>
+        <div class="tl-label">2007–2024</div>
+        <div class="tl-title">Technical Leadership</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-line"></div>
+        <div class="tl-label">2020–2023</div>
+        <div class="tl-title">Graphic Design & UX</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-line"></div>
+        <div class="tl-label">2021–2025</div>
+        <div class="tl-title">BSc Hardware & Software</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot active"></div>
+        <div class="tl-label">2025 →</div>
+        <div class="tl-title">AI-First Development</div>
+      </div>
+    </div>
+
+    <div class="vp-grid">
+      <div class="vp-card">
+        <h3>Systems thinking → clean architecture</h3>
+        <p>17 years optimizing complex processes taught me to think in systems before writing a single line. I design before I code — every project starts with architecture, not a blank file.</p>
+      </div>
+      <div class="vp-card">
+        <h3>AI-augmented, not AI-dependent</h3>
+        <p>"AI doesn't replace developers — it amplifies those who learn to wield it critically." I use Cursor AI and Claude Code as force multipliers, applying manual review and security checks at every stage.</p>
+      </div>
+      <div class="vp-card">
+        <h3>Process optimization → efficient code</h3>
+        <p>Years of digitizing paper workflows and structuring QA checkpoints translate directly: I write maintainable code with clear documentation and structured testing.</p>
+      </div>
+      <div class="vp-card">
+        <h3>Autonomous, fast, iterative</h3>
+        <p>I deliver value independently. From prompt engineering through deployment to monitoring — I own the full cycle and iterate quickly without waiting for hand-holding.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- WORKFLOW -->
+  <div class="section">
+    <p class="section-label">02 · Process</p>
+    <h2>My AI-First Development Workflow</h2>
+    <div class="wf-steps">
+      <div class="wf-step">
+        <div class="wf-num">01</div>
+        <div class="wf-title">Problem Analysis</div>
+        <div class="wf-desc">Prompt engineering for architectural planning. Define data models, API contracts, and edge cases before touching code.</div>
+        <span class="wf-tag">prompt engineering</span>
+      </div>
+      <div class="wf-step">
+        <div class="wf-num">02</div>
+        <div class="wf-title">Rapid Prototyping</div>
+        <div class="wf-desc">Cursor AI and Claude Code for initial scaffolding. Ship a working skeleton in hours, not days.</div>
+        <span class="wf-tag">Cursor AI</span>
+      </div>
+      <div class="wf-step">
+        <div class="wf-num">03</div>
+        <div class="wf-title">Critical Review</div>
+        <div class="wf-desc">Manual code review, security checks, and architectural critique. AI output is the draft — I'm the editor.</div>
+        <span class="wf-tag">manual QA</span>
+      </div>
+      <div class="wf-step">
+        <div class="wf-num">04</div>
+        <div class="wf-title">Testing & Refinement</div>
+        <div class="wf-desc">AI-assisted test generation paired with manual QA. TypeScript types catch what tests miss.</div>
+        <span class="wf-tag">AI-assisted tests</span>
+      </div>
+      <div class="wf-step">
+        <div class="wf-num">05</div>
+        <div class="wf-title">Deployment</div>
+        <div class="wf-desc">Vercel / Netlify + GitHub Actions CI/CD. Zero-downtime deploys with rollback on failure.</div>
+        <span class="wf-tag">CI/CD</span>
+      </div>
+      <div class="wf-step">
+        <div class="wf-num">06</div>
+        <div class="wf-title">Monitoring</div>
+        <div class="wf-desc">Analytics, error tracking, and performance budgets. Ship is not done until it's observed in production.</div>
+        <span class="wf-tag">observability</span>
+      </div>
+    </div>
+    <div class="metric-bar">
+      <span class="metric-num">40–60%</span>
+      <span class="metric-label">faster development cycles — without compromising code quality or architectural rigor</span>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- STACK -->
+  <div class="section">
+    <p class="section-label">03 · Stack</p>
+    <h2>Tools & Technologies</h2>
+    <div class="stack-grid">
+      <div class="stack-cat">
+        <h3>AI Development</h3>
+        <div class="skill-row"><span class="skill-name">Cursor AI</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:90%"></div></div><span class="skill-level">primary</span></div>
+        <div class="skill-row"><span class="skill-name">Claude Code</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:85%"></div></div><span class="skill-level">daily</span></div>
+        <div class="skill-row"><span class="skill-name">GitHub Copilot</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:80%"></div></div><span class="skill-level">daily</span></div>
+        <div class="skill-row"><span class="skill-name">OpenAI API</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:70%"></div></div><span class="skill-level">integration</span></div>
+      </div>
+      <div class="stack-cat">
+        <h3>Frontend</h3>
+        <div class="skill-row"><span class="skill-name">TypeScript</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:85%"></div></div><span class="skill-level">advanced</span></div>
+        <div class="skill-row"><span class="skill-name">Next.js 14</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:80%"></div></div><span class="skill-level">app router</span></div>
+        <div class="skill-row"><span class="skill-name">React 18</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:80%"></div></div><span class="skill-level">hooks</span></div>
+        <div class="skill-row"><span class="skill-name">Tailwind CSS</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:88%"></div></div><span class="skill-level">fluent</span></div>
+      </div>
+      <div class="stack-cat">
+        <h3>Backend & Data</h3>
+        <div class="skill-row"><span class="skill-name">Node.js</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:75%"></div></div><span class="skill-level">REST APIs</span></div>
+        <div class="skill-row"><span class="skill-name">Supabase</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:78%"></div></div><span class="skill-level">PostgreSQL</span></div>
+        <div class="skill-row"><span class="skill-name">Serverless fns</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:70%"></div></div><span class="skill-level">edge</span></div>
+        <div class="skill-row"><span class="skill-name">Azure AI Svcs</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:65%"></div></div><span class="skill-level">integration</span></div>
+      </div>
+      <div class="stack-cat">
+        <h3>DevOps & Design</h3>
+        <div class="skill-row"><span class="skill-name">Git / GitHub</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:88%"></div></div><span class="skill-level">advanced</span></div>
+        <div class="skill-row"><span class="skill-name">Vercel / Netlify</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:82%"></div></div><span class="skill-level">CI/CD</span></div>
+        <div class="skill-row"><span class="skill-name">Figma</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:80%"></div></div><span class="skill-level">UI/UX</span></div>
+        <div class="skill-row"><span class="skill-name">Docker</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:55%"></div></div><span class="skill-level">learning</span></div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- PROJECTS -->
+  <div class="section">
+    <p class="section-label">04 · Work</p>
+    <h2>Projects That Matter</h2>
+    <div class="proj-grid">
+      <div class="proj-card featured">
+        <div class="proj-num">01 · featured</div>
+        <div class="proj-title">Business Process Digitalization Platform</div>
+        <div class="proj-impact">↑ 70% reduction in processing time</div>
+        <div class="proj-desc">Transformed a paper-based approval workflow into a full-stack web application: automated form routing, real-time dashboard, email notifications, and audit log. Cursor AI handled initial scaffolding in under 4 hours; Copilot accelerated the Supabase API layer. Manual architectural review and TypeScript types eliminated a class of runtime errors before production.</div>
+        <div class="proj-tags">
+          <span class="proj-tag">Next.js</span>
+          <span class="proj-tag">TypeScript</span>
+          <span class="proj-tag">Supabase</span>
+          <span class="proj-tag">Cursor AI</span>
+          <span class="proj-tag">Vercel</span>
+        </div>
+        <div class="proj-links">
+          <a class="proj-link">Live Demo ↗</a>
+          <a class="proj-link">GitHub ↗</a>
+          <a class="proj-link">Case Study ↗</a>
+        </div>
+      </div>
+      <div class="proj-card">
+        <div class="proj-num">02</div>
+        <div class="proj-title">AI-Powered Analytics Dashboard</div>
+        <div class="proj-impact">Real-time predictive insights</div>
+        <div class="proj-desc">Real-time business metrics visualization with Azure AI-generated insights and auto-scaling serverless architecture. Designed for non-technical stakeholders.</div>
+        <div class="proj-tags">
+          <span class="proj-tag">Next.js</span>
+          <span class="proj-tag">Azure AI</span>
+          <span class="proj-tag">Tailwind</span>
+          <span class="proj-tag">Vercel</span>
+        </div>
+        <div class="proj-links">
+          <a class="proj-link">Live Demo ↗</a>
+          <a class="proj-link">GitHub ↗</a>
+        </div>
+      </div>
+      <div class="proj-card">
+        <div class="proj-num">03</div>
+        <div class="proj-title">Automated Document Processing System</div>
+        <div class="proj-impact">Eliminated manual data entry</div>
+        <div class="proj-desc">OCR + AI-powered data extraction pipeline, validating and routing documents into existing business systems. Node.js orchestration layer with PostgreSQL persistence.</div>
+        <div class="proj-tags">
+          <span class="proj-tag">Node.js</span>
+          <span class="proj-tag">OCR</span>
+          <span class="proj-tag">AI APIs</span>
+          <span class="proj-tag">PostgreSQL</span>
+        </div>
+        <div class="proj-links">
+          <a class="proj-link">GitHub ↗</a>
+          <a class="proj-link">Docs ↗</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- EDUCATION -->
+  <div class="section">
+    <p class="section-label">05 · Education</p>
+    <h2>Continuous Learning Journey</h2>
+    <div class="edu-grid">
+      <div class="edu-card">
+        <div class="edu-icon uni">🎓</div>
+        <div class="edu-title">BSc Hardware & Software Systems</div>
+        <div class="edu-sub">Plovdiv University · 2021–2025</div>
+      </div>
+      <div class="edu-card">
+        <div class="edu-icon uni">🔐</div>
+        <div class="edu-title">MSc Information Security</div>
+        <div class="edu-sub">Plovdiv University · 2025–present</div>
+      </div>
+      <div class="edu-card">
+        <div class="edu-icon dev">🎨</div>
+        <div class="edu-title">Graphic Design Diploma</div>
+        <div class="edu-sub">SoftUni · 2020–2023</div>
+      </div>
+    </div>
+    <div class="cert-row">
+      <span class="cert-badge">Azure AI Fundamentals</span>
+      <span class="cert-badge">IBM AI Fundamentals</span>
+      <span class="cert-badge">IBM Cybersecurity</span>
+      <span class="cert-badge">Cisco Ethical Hacker</span>
+      <span class="cert-badge">Google Analytics</span>
+      <span class="cert-badge">Oxford Digital Marketing</span>
+      <span class="cert-badge">SoftUni JS & TS</span>
+      <span class="cert-badge">SoftUni UX/UI</span>
+      <span class="cert-badge">GitHub Advanced Git</span>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- CONTACT -->
+  <div class="section">
+    <p class="section-label">06 · Contact</p>
+    <h2>Let's Build the Future Together</h2>
+    <div class="avail-bar">
+      <span class="hero-dot"></span>
+      Available for full-time · remote-first · junior AI-first developer roles
+    </div>
+    <div class="contact-grid">
+      <div>
+        <div class="contact-links">
+          <a class="contact-link"><span class="contact-link-icon">@</span> your.email@example.com</a>
+          <a class="contact-link"><span class="contact-link-icon">in</span> linkedin.com/in/denis-kedikov</a>
+          <a class="contact-link"><span class="contact-link-icon">gh</span> github.com/deniskedikov</a>
+          <a class="contact-link"><span class="contact-link-icon">🌍</span> Bulgaria — Remote / Sofia / Burgas</a>
+        </div>
+      </div>
+      <div>
+        <div class="form-field">
+          <label>Name</label>
+          <input type="text" placeholder="Your name">
+        </div>
+        <div class="form-field">
+          <label>Email</label>
+          <input type="email" placeholder="you@company.com">
+        </div>
+        <div class="form-field">
+          <label>Message</label>
+          <textarea rows="3" placeholder="Tell me about the role..."></textarea>
+        </div>
+        <button class="btn-primary" style="width:100%">Send Message</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const cells = document.querySelector('.gh-grid');
+if (cells) {
+  for(let i=0;i<52*5;i++){
+    const d=document.createElement('div');
+    d.className='gh-cell';
+    const v=Math.random();
+    d.style.background = v<0.55?'rgba(255,255,255,0.05)':v<0.72?'rgba(124,58,237,0.25)':v<0.87?'rgba(124,58,237,0.5)':v<0.96?'rgba(124,58,237,0.8)':'rgba(6,182,212,0.9)';
+    cells.appendChild(d);
+  }
+}
+</script>

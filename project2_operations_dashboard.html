@@ -1,0 +1,172 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:#0F172A;color:#E2E8F0;min-height:100vh;padding:1.25rem}
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem}
+.header-left h1{font-size:18px;font-weight:500}
+.header-left p{font-size:12px;color:#64748B;font-family:var(--font-mono);margin-top:2px}
+.live-dot{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#10B981;background:rgba(16,185,129,0.1);border:0.5px solid rgba(16,185,129,0.25);border-radius:20px;padding:4px 10px}
+.pulse{width:6px;height:6px;background:#10B981;border-radius:50%;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:1.25rem}
+.kpi{background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.08);border-radius:12px;padding:1rem}
+.kpi-label{font-size:11px;color:#64748B;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px}
+.kpi-val{font-size:26px;font-weight:500;font-family:var(--font-mono);line-height:1}
+.kpi-change{font-size:11px;margin-top:6px}
+.up{color:#10B981}.down{color:#EF4444}.warn{color:#F59E0B}
+.kpi-bar-bg{height:3px;background:rgba(255,255,255,0.06);border-radius:2px;margin-top:10px}
+.kpi-bar-fill{height:3px;border-radius:2px;transition:width 0.8s ease}
+
+.grid2{display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px}
+.card{background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.08);border-radius:12px;padding:1.25rem}
+.card-title{font-size:12px;color:#94A3B8;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center}
+.card-title span{font-size:10px;color:#475569;font-family:var(--font-mono)}
+
+canvas{display:block;width:100%!important}
+
+.process-list{display:flex;flex-direction:column;gap:8px}
+.process-row{display:flex;align-items:center;justify-content:space-between;font-size:12px}
+.process-name{color:#CBD5E1;flex:1}
+.process-bar-bg{flex:2;height:6px;background:rgba(255,255,255,0.06);border-radius:3px;margin:0 10px}
+.process-bar-fill{height:6px;border-radius:3px;transition:width 1s ease}
+.process-pct{color:#64748B;width:32px;text-align:right;font-family:var(--font-mono);font-size:11px}
+
+.activity-list{display:flex;flex-direction:column;gap:0}
+.activity-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid rgba(255,255,255,0.05)}
+.activity-item:last-child{border-bottom:none}
+.act-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.act-text{flex:1}
+.act-title{font-size:12px;color:#CBD5E1}
+.act-time{font-size:11px;color:#475569}
+.act-status{font-size:11px;padding:2px 7px;border-radius:4px}
+.s-done{background:rgba(16,185,129,0.12);color:#10B981}
+.s-warn{background:rgba(245,158,11,0.12);color:#F59E0B}
+.s-err{background:rgba(239,68,68,0.12);color:#EF4444}
+
+.map-placeholder{background:rgba(255,255,255,0.02);border-radius:8px;height:140px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.map-dots{position:absolute;inset:0}
+.map-dot{position:absolute;width:8px;height:8px;border-radius:50%;background:#7C3AED;box-shadow:0 0 0 3px rgba(124,58,237,0.2)}
+.map-dot.active{background:#10B981;box-shadow:0 0 0 4px rgba(16,185,129,0.15);animation:glow 2s infinite}
+@keyframes glow{0%,100%{box-shadow:0 0 0 4px rgba(16,185,129,0.15)}50%{box-shadow:0 0 0 8px rgba(16,185,129,0.05)}}
+.map-label{font-size:10px;color:#475569;position:absolute;bottom:8px;right:10px;font-family:var(--font-mono)}
+</style>
+
+<div style="background:#0F172A;padding:1.25rem;border-radius:12px;min-height:100vh">
+<div class="header">
+  <div class="header-left">
+    <h1>Operations Dashboard</h1>
+    <p>Unimex Ltd · Warehouse & Logistics · <span id="clock">--:--:--</span></p>
+  </div>
+  <div class="live-dot"><span class="pulse"></span>Live · Updates every 5s</div>
+</div>
+
+<div class="kpi-row">
+  <div class="kpi">
+    <div class="kpi-label">Orders Today</div>
+    <div class="kpi-val" id="k-orders" style="color:#A78BFA">247</div>
+    <div class="kpi-change up">↑ 12% vs yesterday</div>
+    <div class="kpi-bar-bg"><div class="kpi-bar-fill" style="width:72%;background:linear-gradient(90deg,#7C3AED,#A78BFA)"></div></div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">Fulfilment Rate</div>
+    <div class="kpi-val" id="k-fulfil" style="color:#10B981">94.2%</div>
+    <div class="kpi-change up">↑ Target: 90%</div>
+    <div class="kpi-bar-bg"><div class="kpi-bar-fill" style="width:94%;background:linear-gradient(90deg,#059669,#10B981)"></div></div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">Avg. Process Time</div>
+    <div class="kpi-val" id="k-time" style="color:#06B6D4">18m</div>
+    <div class="kpi-change up">↓ 42% vs manual</div>
+    <div class="kpi-bar-bg"><div class="kpi-bar-fill" style="width:58%;background:linear-gradient(90deg,#0891B2,#06B6D4)"></div></div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">Active Alerts</div>
+    <div class="kpi-val" id="k-alerts" style="color:#F59E0B">3</div>
+    <div class="kpi-change warn">2 medium · 1 low</div>
+    <div class="kpi-bar-bg"><div class="kpi-bar-fill" style="width:15%;background:linear-gradient(90deg,#D97706,#F59E0B)"></div></div>
+  </div>
+</div>
+
+<div class="grid2">
+  <div class="card">
+    <div class="card-title">Hourly Throughput <span>orders / hour</span></div>
+    <canvas id="chart-main" height="140"></canvas>
+  </div>
+  <div class="card">
+    <div class="card-title">Warehouse Zones <span>utilization</span></div>
+    <canvas id="chart-donut" height="140"></canvas>
+  </div>
+</div>
+
+<div class="grid3">
+  <div class="card">
+    <div class="card-title">Process Load <span>live</span></div>
+    <div class="process-list" id="proc-list"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Recent Activity <span>last 10 events</span></div>
+    <div class="activity-list" id="act-list"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Delivery Zones <span>Bulgaria</span></div>
+    <div class="map-placeholder">
+      <div class="map-dots" id="map-dots"></div>
+      <div class="map-label">5 active routes</div>
+    </div>
+    <div style="margin-top:12px;display:flex;flex-direction:column;gap:6px" id="zone-list"></div>
+  </div>
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+// Clock
+function tick(){document.getElementById('clock').textContent=new Date().toLocaleTimeString('bg-BG')}
+tick();setInterval(tick,1000);
+
+// Main chart
+const labels=['08:00','09:00','10:00','11:00','12:00','13:00','14:00','Now'];
+const data=[18,32,45,38,52,41,58,62];
+const ctx=document.getElementById('chart-main').getContext('2d');
+const mainChart=new Chart(ctx,{type:'line',data:{labels,datasets:[{data,borderColor:'#7C3AED',backgroundColor:'rgba(124,58,237,0.08)',borderWidth:2,tension:0.4,fill:true,pointBackgroundColor:'#7C3AED',pointRadius:3,pointHoverRadius:5}]},options:{responsive:true,plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(15,23,42,0.9)',borderColor:'rgba(255,255,255,0.1)',borderWidth:0.5,titleColor:'#94A3B8',bodyColor:'#E2E8F0'}},scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#475569',font:{size:10}}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#475569',font:{size:10}}}}}});
+
+// Donut
+const ctx2=document.getElementById('chart-donut').getContext('2d');
+new Chart(ctx2,{type:'doughnut',data:{labels:['Zone A','Zone B','Zone C','Available'],datasets:[{data:[38,29,19,14],backgroundColor:['#7C3AED','#06B6D4','#10B981','rgba(255,255,255,0.06)'],borderColor:'transparent',borderWidth:0}]},options:{responsive:true,cutout:'68%',plugins:{legend:{position:'right',labels:{color:'#94A3B8',font:{size:11},padding:8,boxWidth:10}}}}});
+
+// Process load
+const procs=[['Order Intake','#7C3AED',87],['QA Check','#06B6D4',62],['Packing','#10B981',91],['Dispatch','#F59E0B',54],['Returns','#EF4444',23]];
+document.getElementById('proc-list').innerHTML=procs.map(([n,c,v])=>`<div class="process-row"><span class="process-name">${n}</span><div class="process-bar-bg"><div class="process-bar-fill" style="width:${v}%;background:${c}"></div></div><span class="process-pct">${v}%</span></div>`).join('');
+
+// Activity
+const acts=[
+  {icon:'📦',bg:'rgba(124,58,237,0.12)',title:'Order #4471 dispatched',time:'2 min ago',s:'s-done',sl:'Done'},
+  {icon:'⚠️',bg:'rgba(245,158,11,0.12)',title:'Zone B capacity at 91%',time:'5 min ago',s:'s-warn',sl:'Alert'},
+  {icon:'✅',bg:'rgba(16,185,129,0.12)',title:'QA batch 112 passed',time:'8 min ago',s:'s-done',sl:'Done'},
+  {icon:'📋',bg:'rgba(6,182,212,0.12)',title:'Supplier delivery confirmed',time:'12 min ago',s:'s-done',sl:'Done'},
+  {icon:'🔄',bg:'rgba(124,58,237,0.12)',title:'Return #892 processed',time:'18 min ago',s:'s-done',sl:'Done'},
+];
+document.getElementById('act-list').innerHTML=acts.map(a=>`<div class="activity-item"><div class="act-icon" style="background:${a.bg}">${a.icon}</div><div class="act-text"><div class="act-title">${a.title}</div><div class="act-time">${a.time}</div></div><span class="act-status ${a.s}">${a.sl}</span></div>`).join('');
+
+// Map dots
+const dots=[{t:28,l:35,a:true},{t:45,l:58,a:true},{t:62,l:42,a:false},{t:38,l:70,a:true},{t:55,l:25,a:false}];
+document.getElementById('map-dots').innerHTML=dots.map(d=>`<div class="map-dot ${d.a?'active':''}" style="top:${d.t}%;left:${d.l}%"></div>`).join('');
+
+// Zones
+const zones=[{c:'🟣',n:'Sofia',v:'38 orders'},{c:'🔵',n:'Plovdiv',v:'24 orders'},{c:'🟢',n:'Varna',v:'19 orders'},{c:'🟡',n:'Burgas',v:'12 orders'},{c:'⚫',n:'Stara Zagora',v:'8 orders'}];
+document.getElementById('zone-list').innerHTML=zones.map(z=>`<div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:#94A3B8">${z.c} ${z.n}</span><span style="color:#475569;font-family:var(--font-mono)">${z.v}</span></div>`).join('');
+
+// Live updates
+let orders=247;
+setInterval(()=>{
+  const delta=Math.floor(Math.random()*4);
+  orders+=delta;
+  document.getElementById('k-orders').textContent=orders;
+  const newPt=data[data.length-1]+(Math.random()>0.5?Math.floor(Math.random()*6):-Math.floor(Math.random()*4));
+  data.push(Math.max(10,Math.min(80,newPt)));
+  if(data.length>12)data.shift();
+  mainChart.update('none');
+},5000);
+</script>

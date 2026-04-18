@@ -1,0 +1,215 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+.app{display:grid;grid-template-columns:1fr 1fr;gap:0;min-height:520px;border:0.5px solid var(--color-border-tertiary);border-radius:16px;overflow:hidden;background:var(--color-background-primary)}
+.left{padding:1.5rem;border-right:0.5px solid var(--color-border-tertiary);display:flex;flex-direction:column}
+.right{padding:1.5rem;background:var(--color-background-secondary);display:flex;flex-direction:column}
+h2{font-size:15px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px}
+.sub{font-size:12px;color:var(--color-text-tertiary);margin-bottom:1.25rem}
+
+.upload-zone{border:1.5px dashed var(--color-border-secondary);border-radius:10px;padding:1.5rem;text-align:center;cursor:pointer;transition:all 0.2s;flex:0 0 auto;margin-bottom:1rem}
+.upload-zone:hover,.upload-zone.drag{border-color:#7C3AED;background:rgba(124,58,237,0.04)}
+.upload-icon{font-size:28px;margin-bottom:8px}
+.upload-text{font-size:13px;color:var(--color-text-secondary)}
+.upload-hint{font-size:11px;color:var(--color-text-tertiary);margin-top:4px}
+
+.doc-list{display:flex;flex-direction:column;gap:8px;flex:1;overflow-y:auto}
+.doc-item{display:flex;align-items:center;gap:10px;padding:10px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:8px;cursor:pointer;transition:border-color 0.15s}
+.doc-item:hover{border-color:rgba(124,58,237,0.4)}
+.doc-item.selected{border-color:#7C3AED;background:rgba(124,58,237,0.04)}
+.doc-icon{width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.doc-name{font-size:13px;color:var(--color-text-primary);font-weight:500}
+.doc-meta{font-size:11px;color:var(--color-text-tertiary)}
+.doc-status{margin-left:auto;font-size:11px;padding:2px 8px;border-radius:10px}
+.s-done{background:rgba(16,185,129,0.1);color:#059669}
+.s-proc{background:rgba(124,58,237,0.1);color:#7C3AED}
+.s-wait{background:rgba(100,116,139,0.1);color:#64748B}
+
+.process-btn{margin-top:1rem;width:100%;padding:10px;background:linear-gradient(135deg,#7C3AED,#06B6D4);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer}
+.process-btn:disabled{opacity:0.4;cursor:not-allowed}
+
+/* Right panel */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;color:var(--color-text-tertiary);text-align:center;gap:8px}
+.empty-state span{font-size:32px}
+.result-panel{display:flex;flex-direction:column;gap:12px;flex:1}
+
+.stage-bar{display:flex;gap:4px;margin-bottom:8px}
+.stage{flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,0.08);transition:background 0.4s}
+.stage.done{background:#10B981}
+.stage.active{background:#7C3AED;animation:shimmer 1s infinite}
+@keyframes shimmer{0%,100%{opacity:1}50%{opacity:0.6}}
+
+.section-label{font-size:10px;color:var(--color-text-tertiary);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px}
+.extracted-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.field{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:8px;padding:8px 10px}
+.field label{font-size:10px;color:var(--color-text-tertiary);display:block;margin-bottom:3px}
+.field-val{font-size:12px;color:var(--color-text-primary);font-family:var(--font-mono)}
+.field.highlight{border-color:rgba(16,185,129,0.4);background:rgba(16,185,129,0.04)}
+.field-full{grid-column:1/-1}
+
+.confidence{display:flex;align-items:center;gap:6px;margin-bottom:12px}
+.conf-label{font-size:11px;color:var(--color-text-secondary)}
+.conf-bar-bg{flex:1;height:6px;background:rgba(255,255,255,0.06);border-radius:3px}
+.conf-bar-fill{height:6px;border-radius:3px;background:linear-gradient(90deg,#10B981,#06B6D4)}
+.conf-pct{font-size:12px;font-family:var(--font-mono);color:#10B981;min-width:36px;text-align:right}
+
+.ai-insights{background:rgba(124,58,237,0.06);border:0.5px solid rgba(124,58,237,0.2);border-radius:8px;padding:10px;margin-bottom:12px}
+.ai-tag{font-size:10px;color:#A78BFA;margin-bottom:6px;display:flex;align-items:center;gap:4px}
+.insight-item{font-size:12px;color:var(--color-text-secondary);padding:3px 0;line-height:1.5}
+.insight-item::before{content:'→ '}
+
+.actions-row{display:flex;gap:8px}
+.act-btn-sm{padding:7px 12px;border-radius:7px;font-size:12px;font-weight:500;cursor:pointer;border:none}
+.btn-export{background:rgba(16,185,129,0.1);color:#059669}
+.btn-db{background:rgba(6,182,212,0.1);color:#0891B2}
+.btn-flag{background:rgba(239,68,68,0.08);color:#DC2626}
+
+.processing-anim{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:12px}
+.proc-label{font-size:13px;color:var(--color-text-secondary)}
+.spinner{width:36px;height:36px;border:2px solid rgba(124,58,237,0.2);border-top-color:#7C3AED;border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+
+<div class="app">
+  <!-- LEFT -->
+  <div class="left">
+    <h2>AI Document Processor</h2>
+    <p class="sub">Upload documents for automated data extraction & validation</p>
+
+    <div class="upload-zone" id="upload-zone" onclick="addDemo()">
+      <div class="upload-icon">📄</div>
+      <div class="upload-text">Click to upload or drop files here</div>
+      <div class="upload-hint">PDF, JPG, PNG · Invoice, Contract, Form, Receipt</div>
+    </div>
+
+    <div class="doc-list" id="doc-list"></div>
+
+    <button class="process-btn" id="proc-btn" onclick="processSelected()">
+      ▶ Process Selected Document
+    </button>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right">
+    <h2>Extraction Results</h2>
+    <p class="sub" id="right-sub">Select a document and click Process</p>
+    <div id="right-panel">
+      <div class="empty-state">
+        <span>🔍</span>
+        <div>No document selected</div>
+        <div style="font-size:11px">Upload and process a document to see AI-extracted data</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const docs=[
+  {id:1,name:'Invoice_Sofia_2024_047.pdf',type:'invoice',icon:'🧾',bg:'rgba(124,58,237,0.12)',status:'done',
+   fields:{Vendor:'TechSupply BG EOOD','Invoice #':'INV-2024-047',Date:'15 Jan 2025',Due:'15 Feb 2025',Subtotal:'€3,240.00',VAT:'€648.00',Total:'€3,888.00',Currency:'EUR'},
+   conf:97,insights:['Payment due in 31 days — schedule reminder','VAT amount matches 20% standard rate','Vendor is verified in supplier database','Amount exceeds €2,000 — requires manager approval']},
+  {id:2,name:'Contract_Maintenance_2025.pdf',type:'contract',icon:'📋',bg:'rgba(6,182,212,0.12)',status:'done',
+   fields:{Parties:'Unimex Ltd / CleanPro','Type':'Service Contract',Start:'01 Feb 2025',End:'31 Jan 2026',Value:'€8,400/yr','Auto-renew':'Yes','Notice period':'30 days',Signatory:'D. Kedikov'},
+   conf:94,insights:['Contract expires in 12 months — set renewal reminder','Auto-renewal clause detected — review 30 days before','Value within pre-approved budget range','Signatory authority confirmed']},
+  {id:3,name:'Delivery_Note_BG2025_118.jpg',type:'delivery',icon:'📦',bg:'rgba(16,185,129,0.12)',status:'done',
+   fields:{Supplier:'LogiPack Sofia',Reference:'DN-118-2025',Items:'24 units / 3 SKUs',Weight:'186 kg',Driver:'P. Georgiev','Vehicle':'CB 4421 AK',Delivered:'12 Jan 2025',Condition:'Good'},
+   conf:91,insights:['All 3 SKUs matched against purchase order PO-2025-021','Weight is within 2% of expected — no discrepancy','Delivery recorded 2 days early — positive supplier KPI','Auto-updated warehouse inventory system']},
+  {id:4,name:'Expense_Report_Jan.xlsx',type:'expense',icon:'💰',bg:'rgba(245,158,11,0.12)',status:'wait',
+   fields:{Employee:'Maria Georgieva',Period:'January 2025',Department:'Operations',Items:'12 line items',Subtotal:'€1,247.50',Approved:'€1,180.00',Flagged:'€67.50',Category:'Travel / Meals'},
+   conf:88,insights:['1 expense item exceeds daily meal allowance by €22.50','Mileage claim requires manager sign-off','Total within monthly budget for Operations dept','3 receipts missing — follow-up email drafted']},
+];
+
+let selected=null;
+let processing=false;
+
+function renderDocs(){
+  document.getElementById('doc-list').innerHTML=docs.map(d=>`
+    <div class="doc-item ${selected===d.id?'selected':''}" onclick="selectDoc(${d.id})">
+      <div class="doc-icon" style="background:${d.bg}">${d.icon}</div>
+      <div style="flex:1;min-width:0">
+        <div class="doc-name" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${d.name}</div>
+        <div class="doc-meta">${d.type.charAt(0).toUpperCase()+d.type.slice(1)} · PDF/JPG</div>
+      </div>
+      <div class="doc-status ${d.status==='done'?'s-done':d.status==='proc'?'s-proc':'s-wait'}">${d.status==='done'?'Processed':d.status==='proc'?'Processing...':'Queued'}</div>
+    </div>`).join('');
+}
+
+function selectDoc(id){
+  selected=id;
+  renderDocs();
+  const doc=docs.find(d=>d.id===id);
+  if(doc.status==='done'){showResult(doc)}else{showEmpty()}
+}
+
+function showEmpty(){
+  document.getElementById('right-sub').textContent='Click Process to extract data';
+  document.getElementById('right-panel').innerHTML='<div class="empty-state"><span>🔍</span><div>Click "Process" to run AI extraction</div></div>';
+}
+
+function addDemo(){
+  const names=['Receipt_Parking_20250118.jpg','Quote_Renovation_Q1.pdf','PO_2025_089.pdf'];
+  const n=names[Math.floor(Math.random()*names.length)];
+  docs.push({id:Date.now(),name:n,type:'misc',icon:'📄',bg:'rgba(100,116,139,0.12)',status:'wait',fields:{},conf:0,insights:[]});
+  renderDocs();
+}
+
+function processSelected(){
+  if(!selected||processing)return;
+  const doc=docs.find(d=>d.id===selected);
+  if(!doc)return;
+  processing=true;
+  doc.status='proc';
+  renderDocs();
+  document.getElementById('right-sub').textContent='AI extraction in progress...';
+  const stages=['Extracting text (OCR)...','Identifying document type...','Parsing fields...','Cross-validating data...','Generating insights...'];
+  let si=0;
+  document.getElementById('right-panel').innerHTML=`<div class="processing-anim"><div class="spinner"></div><div class="proc-label" id="proc-stage">${stages[0]}</div><div class="stage-bar">${'<div class="stage" id="stg'+0+'"></div>'.repeat(5)}</div></div>`;
+  const iv=setInterval(()=>{
+    si++;
+    if(si<stages.length){
+      document.getElementById('proc-stage').textContent=stages[si];
+      document.querySelectorAll('.stage').forEach((el,i)=>{
+        el.classList.remove('active');
+        if(i<si)el.classList.add('done');
+        if(i===si)el.classList.add('active');
+      });
+    } else {
+      clearInterval(iv);
+      processing=false;
+      doc.status='done';
+      doc.conf=doc.conf||Math.floor(88+Math.random()*9);
+      renderDocs();
+      showResult(doc);
+    }
+  },700);
+}
+
+function showResult(doc){
+  document.getElementById('right-sub').textContent=`${doc.name} · ${doc.conf}% confidence`;
+  const fieldHtml=Object.entries(doc.fields).map(([k,v],i)=>`<div class="field ${i===0?'highlight':''} ${i>5?'field-full':''}"><label>${k}</label><div class="field-val">${v}</div></div>`).join('');
+  document.getElementById('right-panel').innerHTML=`
+    <div class="result-panel">
+      <div class="stage-bar">${'<div class="stage done"></div>'.repeat(5)}</div>
+      <div class="section-label">Extracted Fields</div>
+      <div class="extracted-grid">${fieldHtml}</div>
+      <div class="confidence">
+        <span class="conf-label">AI Confidence</span>
+        <div class="conf-bar-bg"><div class="conf-bar-fill" style="width:${doc.conf}%"></div></div>
+        <span class="conf-pct">${doc.conf}%</span>
+      </div>
+      <div class="ai-insights">
+        <div class="ai-tag">✦ AI Insights</div>
+        ${doc.insights.map(i=>`<div class="insight-item">${i}</div>`).join('')}
+      </div>
+      <div class="actions-row">
+        <button class="act-btn-sm btn-export" onclick="alert('Exported to database')">Export to DB</button>
+        <button class="act-btn-sm btn-db" onclick="alert('Sent to ERP system')">Send to ERP</button>
+        <button class="act-btn-sm btn-flag" onclick="alert('Flagged for manual review')">Flag for Review</button>
+      </div>
+    </div>`;
+}
+
+renderDocs();
+selectDoc(1);
+</script>

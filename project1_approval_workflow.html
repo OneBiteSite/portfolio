@@ -1,0 +1,303 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:var(--color-background-tertiary);min-height:100vh}
+.app{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+.sidebar{background:var(--color-background-primary);border-right:0.5px solid var(--color-border-tertiary);padding:1.25rem 0;display:flex;flex-direction:column}
+.logo{padding:0 1.25rem 1.25rem;border-bottom:0.5px solid var(--color-border-tertiary);margin-bottom:1rem}
+.logo-name{font-size:14px;font-weight:500;color:var(--color-text-primary)}
+.logo-sub{font-size:11px;color:var(--color-text-tertiary);font-family:var(--font-mono)}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 1.25rem;font-size:13px;color:var(--color-text-secondary);cursor:pointer;border-left:2px solid transparent}
+.nav-item.active{color:#7C3AED;background:rgba(124,58,237,0.06);border-left-color:#7C3AED;font-weight:500}
+.nav-icon{font-size:14px;width:18px;text-align:center}
+.nav-section{font-size:10px;color:var(--color-text-tertiary);padding:1rem 1.25rem 0.4rem;letter-spacing:1.5px;text-transform:uppercase}
+.badge-count{margin-left:auto;background:rgba(124,58,237,0.12);color:#7C3AED;font-size:10px;padding:1px 6px;border-radius:10px;font-family:var(--font-mono)}
+
+.main{padding:1.5rem;overflow-y:auto}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem}
+.page-title{font-size:18px;font-weight:500;color:var(--color-text-primary)}
+.page-sub{font-size:13px;color:var(--color-text-secondary);margin-top:2px}
+.btn{padding:7px 14px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none}
+.btn-primary{background:#7C3AED;color:#fff}
+.btn-primary:hover{background:#6D28D9}
+
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:1.5rem}
+.stat{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:10px;padding:1rem}
+.stat-label{font-size:11px;color:var(--color-text-tertiary);margin-bottom:6px}
+.stat-num{font-size:22px;font-weight:500;color:var(--color-text-primary);font-family:var(--font-mono)}
+.stat-delta{font-size:11px;margin-top:4px}
+.stat-delta.up{color:#10B981}
+.stat-delta.warn{color:#F59E0B}
+
+.filters{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap}
+.filter-btn{padding:5px 12px;border-radius:20px;font-size:12px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-secondary);cursor:pointer}
+.filter-btn.active{background:rgba(124,58,237,0.1);border-color:rgba(124,58,237,0.4);color:#7C3AED}
+
+.table{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:12px;overflow:hidden}
+.table-head{display:grid;grid-template-columns:1fr 120px 100px 110px 90px 100px;gap:0;padding:10px 1rem;background:var(--color-background-secondary);border-bottom:0.5px solid var(--color-border-tertiary)}
+.th{font-size:11px;color:var(--color-text-tertiary);font-weight:500;letter-spacing:0.5px;text-transform:uppercase}
+.table-row{display:grid;grid-template-columns:1fr 120px 100px 110px 90px 100px;gap:0;padding:12px 1rem;border-bottom:0.5px solid var(--color-border-tertiary);align-items:center;cursor:pointer;transition:background 0.15s}
+.table-row:hover{background:var(--color-background-secondary)}
+.table-row:last-child{border-bottom:none}
+.td{font-size:13px;color:var(--color-text-primary)}
+.td-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:1px}
+.pill{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500}
+.pill-pending{background:rgba(245,158,11,0.1);color:#D97706}
+.pill-approved{background:rgba(16,185,129,0.1);color:#059669}
+.pill-rejected{background:rgba(239,68,68,0.1);color:#DC2626}
+.pill-review{background:rgba(124,58,237,0.1);color:#7C3AED}
+.priority-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px}
+.p-high{background:#EF4444}
+.p-med{background:#F59E0B}
+.p-low{background:#10B981}
+.actions{display:flex;gap:6px}
+.act-btn{padding:3px 10px;border-radius:6px;font-size:11px;cursor:pointer;border:none;font-weight:500}
+.act-approve{background:rgba(16,185,129,0.1);color:#059669}
+.act-approve:hover{background:rgba(16,185,129,0.2)}
+.act-reject{background:rgba(239,68,68,0.08);color:#DC2626}
+.act-reject:hover{background:rgba(239,68,68,0.15)}
+.act-view{background:var(--color-background-secondary);color:var(--color-text-secondary)}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;z-index:100;opacity:0;pointer-events:none;transition:opacity 0.2s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:16px;width:520px;max-width:95vw;padding:1.5rem;box-shadow:none}
+.modal-header{display:flex;justify-content:space-between;align-items:start;margin-bottom:1.25rem}
+.modal-title{font-size:16px;font-weight:500;color:var(--color-text-primary)}
+.modal-close{background:none;border:none;font-size:18px;color:var(--color-text-tertiary);cursor:pointer;padding:0 4px}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.25rem}
+.detail-item label{font-size:11px;color:var(--color-text-tertiary);display:block;margin-bottom:3px}
+.detail-item span{font-size:13px;color:var(--color-text-primary)}
+.detail-full{grid-column:1/-1}
+.comment-box{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:8px;padding:10px;font-size:13px;color:var(--color-text-secondary);line-height:1.6}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem;padding-top:1rem;border-top:0.5px solid var(--color-border-tertiary)}
+.btn-approve{padding:8px 18px;background:#10B981;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer}
+.btn-reject{padding:8px 18px;background:var(--color-background-secondary);color:#DC2626;border:0.5px solid rgba(239,68,68,0.3);border-radius:8px;font-size:13px;font-weight:500;cursor:pointer}
+.btn-cancel{padding:8px 18px;background:var(--color-background-secondary);color:var(--color-text-secondary);border:0.5px solid var(--color-border-secondary);border-radius:8px;font-size:13px;cursor:pointer}
+
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:#1E293B;color:#E2E8F0;padding:10px 16px;border-radius:10px;font-size:13px;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:200}
+.toast.show{opacity:1}
+.timeline-steps{display:flex;flex-direction:column;gap:0;margin-bottom:1rem}
+.tl-step{display:flex;gap:12px;align-items:flex-start;padding:8px 0;border-left:1.5px solid var(--color-border-tertiary);margin-left:8px;padding-left:16px;position:relative}
+.tl-step::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--color-border-secondary);position:absolute;left:-5px;top:12px}
+.tl-step.done::before{background:#10B981}
+.tl-step.active-step::before{background:#7C3AED}
+.tl-step-label{font-size:12px;font-weight:500;color:var(--color-text-primary)}
+.tl-step-sub{font-size:11px;color:var(--color-text-tertiary)}
+</style>
+
+<div class="app">
+  <div class="sidebar">
+    <div class="logo">
+      <div class="logo-name">ProcessFlow</div>
+      <div class="logo-sub">v1.4.2 · Unimex Ltd</div>
+    </div>
+    <p class="nav-section">Main</p>
+    <div class="nav-item active"><span class="nav-icon">📋</span>Approval Queue<span class="badge-count">7</span></div>
+    <div class="nav-item"><span class="nav-icon">📊</span>Dashboard</div>
+    <div class="nav-item"><span class="nav-icon">📁</span>All Requests</div>
+    <div class="nav-item"><span class="nav-icon">✅</span>My Approvals</div>
+    <p class="nav-section">Admin</p>
+    <div class="nav-item"><span class="nav-icon">⚙️</span>Workflow Rules</div>
+    <div class="nav-item"><span class="nav-icon">👥</span>Team</div>
+    <div class="nav-item"><span class="nav-icon">📈</span>Reports</div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <div class="page-title">Approval Queue</div>
+        <div class="page-sub">7 requests awaiting your decision</div>
+      </div>
+      <button class="btn btn-primary" onclick="showToast('New request form opened')">+ New Request</button>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-label">Pending</div>
+        <div class="stat-num" id="stat-pending">7</div>
+        <div class="stat-delta warn">↑ 2 since yesterday</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Approved today</div>
+        <div class="stat-num" id="stat-approved">12</div>
+        <div class="stat-delta up">↑ 4 vs avg</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Avg. resolution</div>
+        <div class="stat-num">1.8h</div>
+        <div class="stat-delta up">↓ 40% vs manual</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">SLA compliance</div>
+        <div class="stat-num">96%</div>
+        <div class="stat-delta up">↑ 18% this month</div>
+      </div>
+    </div>
+
+    <div class="filters">
+      <button class="filter-btn active" onclick="filterRows('all',this)">All (7)</button>
+      <button class="filter-btn" onclick="filterRows('pending',this)">Pending</button>
+      <button class="filter-btn" onclick="filterRows('review',this)">Under Review</button>
+      <button class="filter-btn" onclick="filterRows('high',this)">High Priority</button>
+    </div>
+
+    <div class="table">
+      <div class="table-head">
+        <div class="th">Request</div>
+        <div class="th">Requester</div>
+        <div class="th">Amount</div>
+        <div class="th">Submitted</div>
+        <div class="th">Status</div>
+        <div class="th">Actions</div>
+      </div>
+      <div id="rows-container"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modal-title">Request Details</div>
+        <div style="font-size:12px;color:var(--color-text-tertiary);margin-top:3px" id="modal-id">#REQ-001</div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="detail-grid">
+      <div class="detail-item"><label>Requester</label><span id="d-req">—</span></div>
+      <div class="detail-item"><label>Department</label><span id="d-dept">—</span></div>
+      <div class="detail-item"><label>Amount</label><span id="d-amt">—</span></div>
+      <div class="detail-item"><label>Priority</label><span id="d-pri">—</span></div>
+      <div class="detail-item detail-full"><label>Justification</label><div class="comment-box" id="d-just">—</div></div>
+      <div class="detail-item detail-full">
+        <label>Approval Timeline</label>
+        <div class="timeline-steps" id="d-timeline"></div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-reject" onclick="rejectRow()">Reject</button>
+      <button class="btn-approve" onclick="approveRow()">Approve</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const rows = [
+  {id:'REQ-2401',title:'Office Equipment Purchase',req:'Maria Georgieva',dept:'Operations',amount:'€2,450',date:'Today, 09:14',status:'pending',priority:'high',just:'Replacement of 3 broken workstations in the Sofia office. Current units are 7+ years old and causing productivity loss estimated at 2h/day/person.',timeline:[{label:'Submitted',sub:'Maria Georgieva · 09:14',done:true},{label:'Manager Review',sub:'In progress',active:true},{label:'Finance Approval',sub:'Waiting',done:false},{label:'CFO Sign-off',sub:'Required >€2000',done:false}]},
+  {id:'REQ-2402',title:'Software License Renewal',req:'Ivan Petrov',dept:'IT',amount:'€890',date:'Today, 10:32',status:'review',priority:'med',just:'Annual renewal for Adobe Creative Cloud (5 seats). Used daily by the design and marketing teams. Expiry in 8 days.',timeline:[{label:'Submitted',sub:'Ivan Petrov · 10:32',done:true},{label:'IT Review',sub:'Approved · 11:00',done:true},{label:'Finance Approval',sub:'Under review',active:true},{label:'Complete',sub:'Pending',done:false}]},
+  {id:'REQ-2403',title:'Team Training Budget',req:'Stefka Hristova',dept:'HR',amount:'€3,200',date:'Today, 11:05',status:'pending',priority:'med',just:'Q1 upskilling program: AI tools workshop for 8 team members. ROI estimated at 30% productivity increase based on pilot results.',timeline:[{label:'Submitted',sub:'Stefka Hristova · 11:05',done:true},{label:'HR Director',sub:'Pending',active:true},{label:'Finance',sub:'Waiting',done:false},{label:'CEO Approval',sub:'Required >€3000',done:false}]},
+  {id:'REQ-2404',title:'Cloud Infrastructure Upgrade',req:'Dimitar Todorov',dept:'IT',amount:'€1,100',date:'Yesterday, 16:22',status:'pending',priority:'high',just:'Vercel Pro plan upgrade for 3 production apps. Current free tier is throttling during peak hours causing 503 errors. Urgent.',timeline:[{label:'Submitted',sub:'Dimitar Todorov · 16:22',done:true},{label:'Tech Lead Review',sub:'Approved · 17:00',done:true},{label:'Manager Approval',sub:'Pending',active:true},{label:'Complete',sub:'—',done:false}]},
+  {id:'REQ-2405',title:'Client Entertainment',req:'Nikolay Ivanov',dept:'Sales',amount:'€340',date:'Yesterday, 14:10',status:'review',priority:'low',just:'Business dinner for 4 with potential enterprise client (TechCorp BG). Estimated contract value: €45,000/yr.',timeline:[{label:'Submitted',sub:'Nikolay Ivanov · 14:10',done:true},{label:'Sales Manager',sub:'Approved · 15:30',done:true},{label:'Finance Review',sub:'Under review',active:true},{label:'Complete',sub:'—',done:false}]},
+  {id:'REQ-2406',title:'Ergonomic Chairs (x4)',req:'Gergana Koleva',dept:'Operations',amount:'€960',date:'2 days ago',status:'pending',priority:'low',just:'Replacement of damaged chairs in meeting room B. Current chairs are a safety hazard flagged in last month\'s HSE audit.',timeline:[{label:'Submitted',sub:'Gergana Koleva',done:true},{label:'Facilities Review',sub:'Pending',active:true},{label:'Finance',sub:'Waiting',done:false}]},
+  {id:'REQ-2407',title:'Marketing Analytics Tool',req:'Elena Marinova',dept:'Marketing',amount:'€580',date:'2 days ago',status:'review',priority:'med',just:'Annual subscription to SEMrush for keyword tracking and competitor analysis. Currently using free tier with heavy limitations.',timeline:[{label:'Submitted',sub:'Elena Marinova',done:true},{label:'Marketing Dir.',sub:'Approved',done:true},{label:'Finance Review',sub:'In review',active:true},{label:'Complete',sub:'—',done:false}]}
+];
+
+let activeRow=null;
+let pendingCount=7;
+let approvedCount=12;
+
+function statusPill(s){
+  if(s==='pending')return '<span class="pill pill-pending">Pending</span>';
+  if(s==='approved')return '<span class="pill pill-approved">Approved</span>';
+  if(s==='rejected')return '<span class="pill pill-rejected">Rejected</span>';
+  return '<span class="pill pill-review">In Review</span>';
+}
+
+function renderRows(filter='all'){
+  const c=document.getElementById('rows-container');
+  c.innerHTML='';
+  rows.filter(r=>{
+    if(filter==='all')return true;
+    if(filter==='pending')return r.status==='pending';
+    if(filter==='review')return r.status==='review';
+    if(filter==='high')return r.priority==='high';
+    return true;
+  }).forEach((r,i)=>{
+    const div=document.createElement('div');
+    div.className='table-row';
+    div.innerHTML=`
+      <div class="td"><span class="priority-dot p-${r.priority}"></span>${r.title}<div class="td-sub">#${r.id}</div></div>
+      <div class="td">${r.req}<div class="td-sub">${r.dept}</div></div>
+      <div class="td">${r.amount}</div>
+      <div class="td" style="font-size:12px;color:var(--color-text-secondary)">${r.date}</div>
+      <div class="td">${statusPill(r.status)}</div>
+      <div class="td actions">
+        <button class="act-btn act-view" onclick="openModal(${rows.indexOf(r)})">View</button>
+        ${r.status!=='approved'&&r.status!=='rejected'?`<button class="act-btn act-approve" onclick="quickApprove(${rows.indexOf(r)},event)">✓</button>`:''}
+      </div>`;
+    c.appendChild(div);
+  });
+}
+
+function filterRows(f,btn){
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderRows(f);
+}
+
+function openModal(i){
+  activeRow=i;
+  const r=rows[i];
+  document.getElementById('modal-title').textContent=r.title;
+  document.getElementById('modal-id').textContent='#'+r.id+' · '+r.dept;
+  document.getElementById('d-req').textContent=r.req;
+  document.getElementById('d-dept').textContent=r.dept;
+  document.getElementById('d-amt').textContent=r.amount;
+  document.getElementById('d-pri').innerHTML=`<span class="priority-dot p-${r.priority}"></span>${r.priority.charAt(0).toUpperCase()+r.priority.slice(1)}`;
+  document.getElementById('d-just').textContent=r.just;
+  const tl=document.getElementById('d-timeline');
+  tl.innerHTML=r.timeline.map(t=>`<div class="tl-step ${t.done?'done':''} ${t.active?'active-step':''}"><div><div class="tl-step-label">${t.label}</div><div class="tl-step-sub">${t.sub}</div></div></div>`).join('');
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal(){document.getElementById('modal').classList.remove('open')}
+
+function approveRow(){
+  if(activeRow===null)return;
+  rows[activeRow].status='approved';
+  pendingCount=Math.max(0,pendingCount-1);
+  approvedCount++;
+  updateStats();
+  renderRows('all');
+  closeModal();
+  showToast('✅ Request approved and notification sent');
+}
+
+function rejectRow(){
+  if(activeRow===null)return;
+  rows[activeRow].status='rejected';
+  pendingCount=Math.max(0,pendingCount-1);
+  updateStats();
+  renderRows('all');
+  closeModal();
+  showToast('❌ Request rejected. Requester notified.');
+}
+
+function quickApprove(i,e){
+  e.stopPropagation();
+  rows[i].status='approved';
+  pendingCount=Math.max(0,pendingCount-1);
+  approvedCount++;
+  updateStats();
+  renderRows('all');
+  showToast('✅ '+rows[i].title+' approved');
+}
+
+function updateStats(){
+  document.getElementById('stat-pending').textContent=pendingCount;
+  document.getElementById('stat-approved').textContent=approvedCount;
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+renderRows();
+</script>
